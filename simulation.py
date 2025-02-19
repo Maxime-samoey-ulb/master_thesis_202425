@@ -3,7 +3,7 @@ import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import streamlit as st
-# streamlit run C:\Users\User\PycharmProjects\Master\simulation.py
+# streamlit run C:\Users\User\Documents\GitHub\master_thesis_202425\simulation.py
 import First_class
 
 
@@ -189,5 +189,6 @@ else:
                 ),
             )
             st.plotly_chart(fig)
+            st.write("hello world")
 
 
