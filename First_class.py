@@ -3,14 +3,14 @@ import demandlib.bdew as bdew
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-# streamlit run C:\Users\User\PycharmProjects\Master\simulation.py
+# streamlit run C:\Users\User\Documents\GitHub\master_thesis_202425\simulation.py
 
 
 def set_table(country):
     # path = f"{country}_ref.csv"
     # table = pd.read_csv(path, index_col=0)
     table = pd.read_csv("temperature_data.csv", index_col=0)
-    table.index = pd.to_datetime(table.index, format='ISO8601')
+    table.index = pd.to_datetime(table.index, format='%Y-%m-%d %H:%M:%S')
     return table
 
 
@@ -32,7 +32,7 @@ class MyClass:
     def country_chose(self, country: str):
         self.country = country
         self.ref_table = pd.read_csv("temperature_data.csv", index_col=0).ffill()
-        self.ref_table.index = pd.to_datetime(self.ref_table.index, format='ISO8601')
+        self.ref_table.index = pd.to_datetime(self.ref_table.index, format='%Y-%m-%d %H:%M:%S')
         self.df = pd.DataFrame(index=self.ref_table.index, columns=["Cold Water Temp", "Heated Water Temp",
                                                                     "Delta temp", "Flux out DC", "Outdoor air temp",
                                                                     "Heat demand", "Needed flux", "Delta flux", "Stored"])

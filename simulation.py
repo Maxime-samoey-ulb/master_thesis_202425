@@ -189,6 +189,3 @@ else:
                 ),
             )
             st.plotly_chart(fig)
-            st.write("hello world")
-
-
