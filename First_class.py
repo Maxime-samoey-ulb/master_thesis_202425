@@ -30,7 +30,7 @@ class MyClass:
         self.heated_temp = 30.0  # in °C
         self.delta = 0.0  # in °C
         self.cold_water_profile = str
-        self.heated_water = str
+        self.storage_type = str
         self.storage_capacity = 0
         self.max_temp = 98.0
 
@@ -39,13 +39,8 @@ class MyClass:
         self.heat_loss = heat_loss
         self.Q = heat_loss * area  # in kW
 
-    def set_heated_water_temp(self, temp: int):
+    def set_heat_network_temp(self, temp: int, cold_water: str, delta: float):
         self.heated_temp = temp
-
-    def set_delta_t(self, delta: float):
-        self.delta = delta
-
-    def cold_water_chose(self, cold_water: str):
         self.cold_water_profile = cold_water
         # cw_temp = self.ref_table[f'{self.country}_CW_temperature']
         cw_temp = self.ref_table['USA_CW_temperature']
@@ -53,6 +48,8 @@ class MyClass:
             self.df["Cold Water Temp"] = cw_temp.mean()
         else:
             self.df["Cold Water Temp"] = cw_temp
+        self.delta = delta
+
         self.heated_water_calculation()
 
     def heated_water_calculation(self):
@@ -66,9 +63,6 @@ class MyClass:
         self.country = country
         self.df["Outdoor air temp"] = self.ref_table[f"{self.country}_air_temperature"]
 
-    def heated_water_chose(self, heated_water: str):
-        self.heated_water = heated_water
-
     def heat_calculation(self, heat_demand):
         self.df["Heat demand"] = bdew.HeatBuilding(
                                  self.df.index,
@@ -80,13 +74,14 @@ class MyClass:
                                  name="EFH",
         ).get_bdew_profile()
 
-    def set_storage_capacity(self, storage: int):
+    def set_storage(self, heated_water: str, storage: int):
+        self.storage_type = heated_water
         self.storage_capacity = storage
 
     def run_calculation(self):
         self.df["Needed flux"] = self.df["Heat demand"]*10000/(1.16*self.df["Delta temp"])
         self.df["Delta flux"] = self.df["Flux out DC"] - self.df["Needed flux"]
-        if self.heated_water == "Hot water storage":
+        if self.storage_type == "Volumetric storage":
             old_store = 0.0
             store = []
             for i in range(8760):
@@ -100,7 +95,7 @@ class MyClass:
                     new_store = 0
                 store.append(new_store)
             self.df["Stored"] = pd.Series(index=self.df.index, data=store)
-        elif self.heated_water == "Thermal heating storage":
+        elif self.storage_type == "Thermal storage":
             old_temp = 30.0
             temp = []
             for i in range(8760):
