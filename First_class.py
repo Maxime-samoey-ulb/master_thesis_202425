@@ -17,25 +17,22 @@ def set_table(country):
 class MyClass:
     def __init__(self):
         self.country = str
-        self.ref_table = pd.DataFrame()
-        self.df = pd.DataFrame()
+        # self.ref_table = pd.DataFrame()
+        # self.df = pd.DataFrame()
+        self.ref_table = pd.read_csv("temperature_data.csv", index_col=0).ffill()
+        self.ref_table.index = pd.to_datetime(self.ref_table.index, format='%Y-%m-%d %H:%M:%S')
+        self.df = pd.DataFrame(index=self.ref_table.index, columns=["Cold Water Temp", "Heated Water Temp",
+                                                                    "Delta temp", "Flux out DC", "Outdoor air temp",
+                                                                    "Heat demand", "Needed flux", "Delta flux", "Stored"])
         self.area = float  # in square meters
         self.heat_loss = float  # in kW per square meters
         self.Q = 1.0  # in kW
         self.heated_temp = 30.0  # in °C
         self.delta = 0.0  # in °C
         self.cold_water_profile = str
-        self.heated_water_profile = str
-        self.surplus_heated_water = str
+        self.heated_water = str
         self.storage_capacity = 0
-
-    def country_chose(self, country: str):
-        self.country = country
-        self.ref_table = pd.read_csv("temperature_data.csv", index_col=0).ffill()
-        self.ref_table.index = pd.to_datetime(self.ref_table.index, format='%Y-%m-%d %H:%M:%S')
-        self.df = pd.DataFrame(index=self.ref_table.index, columns=["Cold Water Temp", "Heated Water Temp",
-                                                                    "Delta temp", "Flux out DC", "Outdoor air temp",
-                                                                    "Heat demand", "Needed flux", "Delta flux", "Stored"])
+        self.max_temp = 98.0
 
     def set_dc_cara(self, area, heat_loss):
         self.area = area
@@ -63,15 +60,16 @@ class MyClass:
                     self.df["Cold Water Temp"] + self.delta)
         self.df.loc[self.heated_temp >= self.df["Cold Water Temp"] + self.delta, "Heated Water Temp"] = self.heated_temp
         self.df["Delta temp"] = self.df["Heated Water Temp"] - self.df["Cold Water Temp"]
-
-    def run_flux_dc(self):
         self.df["Flux out DC"] = self.Q/(1.16*self.df["Delta temp"])
 
+    def country_chose(self, country: str):
+        self.country = country
+        self.df["Outdoor air temp"] = self.ref_table[f"{self.country}_air_temperature"]
+
     def heated_water_chose(self, heated_water: str):
-        self.heated_water_profile = heated_water
+        self.heated_water = heated_water
 
     def heat_calculation(self, heat_demand):
-        self.df["Outdoor air temp"] = self.ref_table[f"{self.country}_air_temperature"]
         self.df["Heat demand"] = bdew.HeatBuilding(
                                  self.df.index,
                                  temperature=self.df["Outdoor air temp"],
@@ -82,16 +80,15 @@ class MyClass:
                                  name="EFH",
         ).get_bdew_profile()
 
-    def surplus_heated_water_chose(self, surplus_heated_water: str, storage: int):
-        self.surplus_heated_water = surplus_heated_water
+    def set_storage_capacity(self, storage: int):
         self.storage_capacity = storage
 
     def run_calculation(self):
         self.df["Needed flux"] = self.df["Heat demand"]*10000/(1.16*self.df["Delta temp"])
         self.df["Delta flux"] = self.df["Flux out DC"] - self.df["Needed flux"]
-        old_store = 0.0
-        store = []
-        if self.storage_capacity != 0:
+        if self.heated_water == "Hot water storage":
+            old_store = 0.0
+            store = []
             for i in range(8760):
                 to_store = self.df.iloc[i]["Delta flux"]
                 if i != 0:
@@ -103,3 +100,23 @@ class MyClass:
                     new_store = 0
                 store.append(new_store)
             self.df["Stored"] = pd.Series(index=self.df.index, data=store)
+        elif self.heated_water == "Thermal heating storage":
+            old_temp = 30.0
+            temp = []
+            for i in range(8760):
+                if i != 0:
+                    old_temp = temp[i-1]
+                if self.df.iloc[i]["Delta flux"] >= 0:
+                    added_energy = self.df.iloc[i]["Delta flux"] * 1.16 * self.df.iloc[i]["Delta temp"]
+                    delta_temp = added_energy/(1.16*self.storage_capacity)
+                else:
+                    extracted_energy = self.df.iloc[i]["Delta flux"] * 1.16 * (old_temp - self.df.iloc[i]["Cold Water Temp"])
+                    delta_temp = extracted_energy/(1.16*self.storage_capacity)
+                new_temp = delta_temp + old_temp
+                if new_temp > self.max_temp:
+                    new_temp = self.max_temp
+                elif 30 > new_temp:
+                    new_temp = 30
+                temp.append(new_temp)
+            self.df["Stored"] = pd.Series(index=self.df.index, data=temp)
+
