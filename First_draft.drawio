@@ -75,10 +75,10 @@
         <mxCell id="mk669JkTlTOHlN9avRZv-12" value="Cooling&lt;div&gt;Tower&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="384" y="305" width="60" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="mk669JkTlTOHlN9avRZv-13" value="&lt;div&gt;Thermal&lt;/div&gt;Storage" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
+        <mxCell id="mk669JkTlTOHlN9avRZv-13" value="&lt;div&gt;Thermal&lt;/div&gt;&lt;div&gt;Heat&lt;/div&gt;Storage" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
           <mxGeometry x="110" y="580" width="80" height="100" as="geometry" />
         </mxCell>
-        <mxCell id="mk669JkTlTOHlN9avRZv-14" value="&lt;div&gt;Hot&lt;/div&gt;&lt;div&gt;Water&lt;/div&gt;Storage" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
+        <mxCell id="mk669JkTlTOHlN9avRZv-14" value="&lt;div&gt;Volumetric&lt;/div&gt;Storage" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
           <mxGeometry x="640" y="580" width="80" height="100" as="geometry" />
         </mxCell>
         <mxCell id="mk669JkTlTOHlN9avRZv-15" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fillColor=#e51400;strokeColor=#B20000;width=31;endSize=7.22;" parent="1" edge="1">
