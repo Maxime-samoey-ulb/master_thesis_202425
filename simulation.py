@@ -3,6 +3,7 @@ import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import streamlit as st
+import time
 # streamlit run C:\Users\User\Documents\GitHub\master_thesis_202425\simulation.py
 import First_class
 
@@ -46,12 +47,12 @@ else:
 
     st.subheader("Specification of the DC")
     col_surface, col_heat = st.columns([1, 1])
-    surface = col_surface.number_input("Insert the surface area of the DC (m2)", value=2000)
-    heat_losses = col_heat.number_input("Insert the heat losses par surface area (kW/m2)", value=15)
+    surface = col_surface.number_input("Surface area of the DC (m2)", value=1500)
+    heat_losses = col_heat.number_input("Heat losses per surface area (kW/m2)", value=2.5)
     Class.set_dc_cara(surface, heat_losses)
-    st.write(Class.Q, 'kW of heat realised by the DC and going to the heat network')
+    st.write(Class.Q/1000, 'MW of waste heat are produced by the DC.')
 
-    st.subheader("Specification of the heat network")
+    st.subheader("Specification of the water side")
     col1_heat, col2_heat, col3_heat = st.columns([1, 1, 1])
     Heated_temp = col1_heat.slider("Heated water temperature (°C)", 20, 40, 30)
     Cold_water = col2_heat.selectbox(
@@ -102,7 +103,7 @@ else:
         yaxis2=dict(
             title=dict(text="Flow rate [m3/h]"),
             side="right",
-            range=[0, 9000],
+            range=[0, 900],
             overlaying="y",
             tickmode="sync",
         ),
@@ -110,9 +111,11 @@ else:
     st.plotly_chart(fig)
     st.write("Mean flow rate: ", Class.df["Flux out DC"].mean(), 'm3/h.')
 
-    st.subheader("Location of the DC")
+    st.subheader("Location of the end user")
     DC_country_location = st.radio("Outdoor temp for the given location",
-                                   ["USA", "Germany", "Custom"],
+                                   ["USA", "Germany"
+                                       # , "Custom"
+                                    ],
                                    horizontal=True)
     Class.country_chose(DC_country_location)
     if st.checkbox("show outdoor temperature profile?"):
@@ -157,7 +160,8 @@ else:
                                       )
         note.update({'Custom_heat': heat_demand})
 
-    Heat_demand = Class.heat_calculation(note[Load_country_location+'_heat'])
+    nbr_household = st.slider("number of hundred of household", 1, 100, 15)
+    Heat_demand = Class.heat_calculation(note[Load_country_location+'_heat'], nbr_household*100)
     fig = go.Figure(
         data=go.Scatter(
             x=Class.df.index,
@@ -177,7 +181,7 @@ else:
     )
     st.plotly_chart(fig)
 
-    st.write("The typical household heat demand in ", note[Load_country_location], " is set to ",
+    st.write("The typical annual household heat demand in ", note[Load_country_location], " is set to ",
              note[Load_country_location+'_heat'], "kWh.")
     st.link_button("Link to the household heat demand",
                    note[Load_country_location+"_heat_ref"])
@@ -189,97 +193,176 @@ else:
          "DC - CT - storage - network"),
         horizontal=True
     )
-    storage_capacity = 0
     storage_type = "None"
+    storage_capacity = 0
     if network_type == "DC - network":
         st.image("network_DC_load.png", caption="The minimal infrastructure: the Data center and the heat network.")
+        st.write("In this situation, the side with the lowest flow rate drive the flow rate of the other ")
     elif network_type == "DC - CT - network":
         st.image("network_DC_load_CT.png", caption="The infrastructure containing the Data center, "
                                                    "a cooling tower and the heat network.")
     elif network_type == "DC - CT - storage - network":
-        st.image("network_DC_load_storage.png", caption="The infrastructure containing the Data center, "
+        st.image("network_DC_load_CT_storage.png", caption="The infrastructure containing the Data center, "
                                                         "a cooling tower, a storage and the heat network.")
 
         storage_type = st.radio(
-            "What type of storage??",
-            ("Volumetric storage", "Thermal storage"),
+            "which type of heat storage?",
+            ("Thermal storage", "Volumetric storage"),
             horizontal=True
         )
         col1_storage, col2_storage = st.columns([1, 1])
-        col1_storage.link_button("Reference for volumetric storage",
+        col1_storage.link_button("Reference for thermal storage",
+                                 "https://www.pv-magazine.com/2022/07/06/europes-largest-power-to-heat-plant/")
+        col2_storage.link_button("Reference for volumetric storage",
                                  "https://www.nachhaltigwirtschaften.at/resources/pdf"
                                  "/task28_2_6_Thermal_Energy_Storage.pdf")
-        col2_storage.link_button("Reference for thermal storage",
-                                 "https://www.pv-magazine.com/2022/07/06/europes-largest-power-to-heat-plant/")
         storage_capacity = st.slider("Volume of the storage in hundred cubic meter", 1, 1000, 100)*100
         st.write(storage_capacity, " cubic meter")
-    Class.set_storage(storage_type, storage_capacity)
+    Class.set_storage(network_type, storage_type, storage_capacity)
 
-    if st.button("Run Simulation"):
-        Class.run_calculation()
-        fig = go.Figure(
-            data=go.Scatter(
+    # if st.button("Run Simulation"):
+    st.header("Simulation :")
+    begin_time = time.time()
+    Class.run_calculation()
+    st.write("Execution time:", time.time() - begin_time)
+    fig = go.Figure(
+        data=go.Scatter(
+            x=Class.df.index,
+            y=Class.df["Needed flux"],
+            name="Heat demand [m3/h]",
+            line=dict(color='green'),
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=Class.df.index,
+            y=Class.df["Flux out DC"],
+            name="Flow rate out of DC at full load [m3/h]" if network_type == "DC - network"
+            else "Flow rate out of DC [m3/h]",
+            line=dict(color='magenta') if network_type == "DC - network"
+            else dict(color='indianred'),
+        )
+    )
+    if network_type == "DC - network":
+        fig.add_trace(
+            go.Scatter(
                 x=Class.df.index,
-                y=Class.df["Flux out DC"],
+                y=Class.df["Down scale DC"],
                 name="Flow rate out of DC [m3/h]",
                 line=dict(color='indianred'),
             )
         )
-        fig.add_trace(
+    fig.update_layout(
+        title="Final run",
+        legend=dict(orientation="h"),
+        yaxis=dict(
+            title=dict(text="Flux [m3/h]"),
+            side="left",
+            range=[0, 700],
+        ),
+    )
+    st.plotly_chart(fig)
+
+    if storage_type == "Volumetric storage":
+        fig = go.Figure(
             go.Scatter(
                 x=Class.df.index,
-                y=Class.df["Flux out DC"] if network_type == "DC - network" else Class.df["Needed flux"],
-                name="Heat demand [m3/h]",
-                line=dict(color='green'),
+                y=Class.df["Stored"],
+                name="Hot water stored [m3]",
+                line=dict(color='grey'),
             )
         )
-        if storage_type == "Volumetric storage":
-            fig.add_trace(
-                go.Scatter(
-                    x=Class.df.index,
-                    y=Class.df["Stored"],
-                    yaxis="y2",
-                    name="Hot water stored [m3]",
-                    line=dict(color='grey'),
-                )
-            )
-        elif storage_type == "Thermal storage":
-            fig.add_trace(
-                go.Scatter(
-                    x=Class.df.index,
-                    y=Class.df["Stored"],
-                    yaxis="y2",
-                    name="Thermal energy stored [°C]",
-                    line=dict(color='grey'),
-                )
-            )
         fig.update_layout(
-            title="Final run",
+            title="Level inside the volumetric storage",
             legend=dict(orientation="h"),
             yaxis=dict(
-                title=dict(text="Flux [m3/h]"),
+                title=dict(text="Volume [m3]"),
                 side="left",
-                range=[0, 4500],
+                range=[0, storage_capacity*9/8],
+                overlaying="y",
+                tickmode="sync",
             ),
         )
-        if storage_type == "Volumetric storage":
-            fig.update_layout(
-                yaxis2=dict(
-                    title=dict(text="Volume [m3]"),
-                    side="right",
-                    range=[0, storage_capacity*9/8],
-                    overlaying="y",
-                    tickmode="sync",
-                ),
-            )
-        elif storage_type == "Thermal storage":
-            fig.update_layout(
-                yaxis2=dict(
-                    title=dict(text="Temperature [°C]"),
-                    side="right",
-                    range=[0, 112.5],
-                    overlaying="y",
-                    tickmode="sync",
-                ),
-            )
         st.plotly_chart(fig)
+    elif storage_type == "Thermal storage":
+        fig = go.Figure(
+            go.Scatter(
+                x=Class.df.index,
+                y=Class.df["Stored"],
+                name="Thermal energy stored [°C]",
+                line=dict(color='grey'),
+            )
+        )
+        fig.update_layout(
+            title="Level inside the thermal storage",
+            legend=dict(orientation="h"),
+            yaxis=dict(
+                title=dict(text="Temperature [°C]"),
+                side="left",
+                range=[0, 112.5],
+                overlaying="y",
+                tickmode="sync",
+            ),
+        )
+        st.plotly_chart(fig)
+    else:
+        st.write("No storage figure as no storage inside the network")
+
+    fig = go.Figure(
+        data=go.Scatter(
+            x=Class.df.index,
+            y=Class.df["Through CT"],
+            name="Lost heat production [m3/h]" if network_type == "DC - network"
+            else "Flow rate through the CT [m3/h] [m3/h]",
+            line=dict(color='indianred'),
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=Class.df.index,
+            y=Class.df["Too short"],
+            name="Flow rate compensated by the houses [m3/h]",
+            line=dict(color='green'),
+        )
+    )
+    fig.update_layout(
+        title="Too much/too short",
+        legend=dict(orientation="h"),
+        yaxis=dict(
+            title=dict(text="Flux [m3/h]"),
+            side="left",
+            range=[-300, 450],
+        ),
+    )
+    st.plotly_chart(fig)
+
+    st.download_button(
+        label="Download Full CSV",
+        data=Class.df.to_csv(),
+        file_name=f'df_{Class.country}_{Class.nbr_household}house_{Class.storage_type}_'
+                  f'{Class.storage_capacity}00m3.csv',
+        icon=":material/download:",
+    )
+
+    df = Class.df
+    df = df.drop(["Cold Water Temp", "Heated Water Temp", "Delta temp", "Outdoor air temp",
+                  "Heat demand", "Delta flux"], axis=1)
+
+    df = df.apply(pd.to_numeric)
+    df_12h_mean = df.resample("12h").mean()
+    df_12h = df.resample("12h").asfreq()
+
+    st.download_button(
+        label="Download CSV (12h resample mean)",
+        data=df_12h_mean.to_csv(),
+        file_name=f'df_{Class.country}_{Class.nbr_household}house_{Class.storage_type}_'
+                  f'{Class.storage_capacity}m3_12h_mean.csv',
+        icon=":material/download:",
+    )
+    # st.download_button(
+    #     label="Download CSV (12h resample)",
+    #     data=df_12h.to_csv(),
+    #     file_name=f'df_{Class.country}_{Class.nbr_household}house_{Class.storage_type}_'
+    #               f'{Class.storage_capacity}m3_12h.csv',
+    #     icon=":material/download:",
+    # )
