@@ -1,9 +1,51 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36" version="27.0.5">
   <diagram name="Page-1" id="-Vk95npZi8JgCMtbpIv_">
-    <mxGraphModel>
+    <mxGraphModel dx="1426" dy="905" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="XhBf5jvdrKggiifJzzgr-2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="40" y="350" width="180" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="XhBf5jvdrKggiifJzzgr-8" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="320" y="350" width="180" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="XhBf5jvdrKggiifJzzgr-9" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="600" y="350" width="180" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="XhBf5jvdrKggiifJzzgr-10" value="" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn2.iconfinder.com/data/icons/boxicons-regular-vol-1/24/bx-building-house-128.png" vertex="1" parent="1">
+          <mxGeometry x="710" y="370" width="100" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="XhBf5jvdrKggiifJzzgr-11" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.iot_analytics_pipeline;" vertex="1" parent="1">
+          <mxGeometry x="414" y="411.85" width="98" height="52.77" as="geometry" />
+        </mxCell>
+        <mxCell id="XhBf5jvdrKggiifJzzgr-12" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#505050;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;outlineConnect=0;align=center;shape=mxgraph.office.servers.mainframe_host;" vertex="1" parent="1">
+          <mxGeometry x="170" y="404.62" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="XhBf5jvdrKggiifJzzgr-13" value="" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn2.iconfinder.com/data/icons/bitsies/128/Fire-128.png" vertex="1" parent="1">
+          <mxGeometry x="10" y="384.62" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="XhBf5jvdrKggiifJzzgr-14" value="&lt;font style=&quot;font-size: 24px;&quot;&gt;Waste heat&amp;nbsp;&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 24px;&quot;&gt;sources&lt;/font&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="40" y="350" width="150" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="XhBf5jvdrKggiifJzzgr-15" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;width=7;endSize=3.89;fillColor=#f8cecc;strokeColor=#b85450;" edge="1" parent="1" source="XhBf5jvdrKggiifJzzgr-2" target="XhBf5jvdrKggiifJzzgr-8">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="470" as="sourcePoint" />
+            <mxPoint x="440" y="420" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="XhBf5jvdrKggiifJzzgr-16" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;width=7;endSize=3.89;fillColor=#d5e8d4;strokeColor=#82b366;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="500" y="399.5" as="sourcePoint" />
+            <mxPoint x="600" y="399.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="XhBf5jvdrKggiifJzzgr-17" value="&lt;div&gt;&lt;font style=&quot;font-size: 24px;&quot;&gt;Heat network&lt;/font&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="315" y="365" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="XhBf5jvdrKggiifJzzgr-18" value="&lt;span style=&quot;font-size: 24px;&quot;&gt;District&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="625" y="365" width="100" height="40" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
