@@ -160,7 +160,7 @@ else:
                                       )
         note.update({'Custom_heat': heat_demand})
 
-    nbr_household = st.slider("number of hundred of household", 1, 100, 15)
+    nbr_household = st.slider("number of hundred of household", 1, 100, 20)
     Heat_demand = Class.heat_calculation(note[Load_country_location+'_heat'], nbr_household*100)
     fig = go.Figure(
         data=go.Scatter(
@@ -340,7 +340,7 @@ else:
         label="Download Full CSV",
         data=Class.df.to_csv(),
         file_name=f'df_{Class.country}_{Class.nbr_household}house_{Class.storage_type}_'
-                  f'{Class.storage_capacity}00m3.csv',
+                  f'{Class.storage_capacity}m3.csv',
         icon=":material/download:",
     )
 
@@ -359,10 +359,13 @@ else:
                   f'{Class.storage_capacity}m3_12h_mean.csv',
         icon=":material/download:",
     )
-    # st.download_button(
-    #     label="Download CSV (12h resample)",
-    #     data=df_12h.to_csv(),
-    #     file_name=f'df_{Class.country}_{Class.nbr_household}house_{Class.storage_type}_'
-    #               f'{Class.storage_capacity}m3_12h.csv',
-    #     icon=":material/download:",
-    # )
+
+    table = pd.read_csv("temperature_data.csv", index_col=0)
+    table.index = pd.to_datetime(table.index, format='%Y-%m-%d %H:%M:%S')
+    table = table.resample("12h").mean()
+    st.download_button(
+        label="Download temp (12h resample)",
+        data=table.to_csv(),
+        file_name=f'temp_12h.csv',
+        icon=":material/download:",
+    )
