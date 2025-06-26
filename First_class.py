@@ -126,7 +126,7 @@ class MyClass:
                     added_energy = delta_flux_list[i] * 1.16 * delta_temp_list[i]
                     delta_temp = added_energy/(1.16*self.storage_capacity)
                 else:
-                    extracted_energy = delta_flux_list[i] * 1.16 * (old_temp - cold_water_list[i])
+                    extracted_energy = delta_flux_list[i] * 1.16 * delta_temp_list[i]  # (old_temp - cold_water_list[i])
                     delta_temp = extracted_energy/(1.16*self.storage_capacity)
                 new_temp = delta_temp + old_temp
                 if new_temp > self.max_temp:
